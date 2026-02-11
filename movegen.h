@@ -13,5 +13,7 @@ vector<Move> generateBishopMoves(const Board& board, bool isWhiteTurn);
 vector<Move> generateRookMoves(const Board& board, bool isWhiteTurn);
 vector<Move> generateQueenMoves(const Board& board, bool isWhiteTurn);
 vector<Move> generateKingMoves(const Board& board, bool isWhiteTurn);
+vector<Move> generateAllMoves(const Board& board, bool isWhiteTurn);
+vector<Move> generateLegalMoves(Board& board, bool isWhiteTurn);
 
 #endif
