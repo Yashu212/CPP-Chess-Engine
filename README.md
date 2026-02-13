@@ -185,4 +185,3 @@ Type `quit` to exit the game.
 ## 👤 Author
 
 **Yash Shukla**  
-C++ | Backend | Systems Engineering
