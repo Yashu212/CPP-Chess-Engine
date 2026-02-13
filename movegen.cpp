@@ -3,10 +3,12 @@
 using namespace std;
 
 vector<Move> generatePawnMoves(const Board& board, bool isWhiteTurn) {
-    // ignore en passant, promotion for now.
+    // ignore en passant for now.
     vector<Move> moves;
     char pawn = isWhiteTurn ? 'P' : 'p';
     int direction = isWhiteTurn ? -1 : 1; // White moves up, black moves down
+    int startRow = isWhiteTurn ? 6 : 1; // Starting row for pawns
+    int promotionRow = isWhiteTurn ? 0 : 7; // Row for promotion
 
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
@@ -14,13 +16,19 @@ vector<Move> generatePawnMoves(const Board& board, bool isWhiteTurn) {
                 //forward moves
                 if (x + direction >= 0 && x + direction < 8 && board.getPiece(x + direction, y) == '.') {
                     // Single move forward
-                    moves.push_back({x, y, x + direction, y});
+                    if(x + direction == promotionRow){
+                        char promotionOption[] = {'Q', 'R', 'B', 'N'};
+                        for (char piece : promotionOption) {
+                            char promotionPiece = isWhiteTurn ? piece : tolower(piece);
+                            moves.push_back({x, y, x + direction, y, promotionPiece});
+                        }
+                    }
+                    else
+                        moves.push_back({x, y, x + direction, y});
 
                     // Double move forward from starting position
-                    if ((isWhiteTurn && x == 6) || (!isWhiteTurn && x == 1)){
-                        if (board.getPiece(x + 2 * direction, y) == '.') {
-                            moves.push_back({x, y, x + 2 * direction, y});
-                        }
+                    if (x == startRow && board.getPiece(x + 2 * direction, y) == '.') {
+                        moves.push_back({x, y, x + 2 * direction, y});
                     }
                     
                 }
@@ -30,16 +38,33 @@ vector<Move> generatePawnMoves(const Board& board, bool isWhiteTurn) {
                     if(y > 0){
                         char targetPiece = board.getPiece(x + direction, y - 1);
                         if(targetPiece != '.' && ((isWhiteTurn && islower(targetPiece)) || (!isWhiteTurn && isupper(targetPiece))) ){
-                            moves.push_back({x, y, x + direction, y - 1});
+                            if(x+direction == promotionRow){
+                                char promotionOption[] = {'Q', 'R', 'B', 'N'};
+                                for (char piece : promotionOption) {
+                                    char promotionPiece = isWhiteTurn ? piece : tolower(piece);
+                                    moves.push_back({x, y, x + direction, y - 1, promotionPiece});
+                                }
+                            }
+                            else
+                                moves.push_back({x, y, x + direction, y - 1});
                         }
                     }
                     //Right Diagonal move.
                     if(y < 7){
                         char targetPiece = board.getPiece(x + direction, y + 1);
                         if(targetPiece != '.' && ((isWhiteTurn && islower(targetPiece)) || (!isWhiteTurn && isupper(targetPiece))) ){
-                            moves.push_back({x, y, x + direction, y + 1});
+                            if(x+direction == promotionRow){
+                                char promotionOption[] = {'Q', 'R', 'B', 'N'};
+                                for (char piece : promotionOption) {
+                                    char promotionPiece = isWhiteTurn ? piece : tolower(piece);
+                                    moves.push_back({x, y, x + direction, y + 1, promotionPiece});
+                                }
+                            }
+                            else
+                                moves.push_back({x, y, x + direction, y + 1});
                         }
                     }
+
                 }
             }
         }
@@ -217,4 +242,21 @@ vector<Move> generateLegalMoves(Board& board, bool isWhiteTurn) {
         }
     }
     return legalMoves;
+}
+
+long long perft(Board& board, bool isWhiteTurn, int depth) {
+    if (depth == 0) {
+        return 1; // Reached a leaf node
+    }
+
+    long long nodes = 0;
+    auto legalMoves = generateLegalMoves(board, isWhiteTurn);
+    for (auto& move : legalMoves) {
+        char capturedPiece = board.getPiece(move.toX, move.toY);
+        if (board.makeMove(move)) {
+            nodes += perft(board, !isWhiteTurn, depth - 1);
+            board.undoMove(move, capturedPiece);
+        }
+    }
+    return nodes;
 }

@@ -15,5 +15,6 @@ vector<Move> generateQueenMoves(const Board& board, bool isWhiteTurn);
 vector<Move> generateKingMoves(const Board& board, bool isWhiteTurn);
 vector<Move> generateAllMoves(const Board& board, bool isWhiteTurn);
 vector<Move> generateLegalMoves(Board& board, bool isWhiteTurn);
+long long perft(Board& board, bool isWhiteTurn, int depth);
 
 #endif

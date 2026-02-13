@@ -49,6 +49,9 @@ bool Board::makeMove(const Move& move) {
     }
     board[move.toX][move.toY] = piece;
     board[move.fromX][move.fromY] = '.';
+    if(move.promotionPiece != '.'){
+        board[move.toX][move.toY] = move.promotionPiece;
+    }
     return true;
 }
 
@@ -56,5 +59,10 @@ void Board::undoMove(const Move& move, char capturedPiece) {
     char piece = board[move.toX][move.toY];
     board[move.fromX][move.fromY] = piece;
     board[move.toX][move.toY] = capturedPiece;
+    if(move.promotionPiece != '.'){
+        // Revert promotion
+        char pawn = isupper(move.promotionPiece) ? 'P' : 'p';
+        board[move.fromX][move.fromY] = pawn;
+    }
 }
 
